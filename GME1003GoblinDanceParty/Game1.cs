@@ -18,7 +18,7 @@ namespace GME1003GoblinDanceParty
             public Vector2 Position;
             public Color Color;
             public float Scale;
-            public float Transparency;
+            public float Transparency; // per-star transparency already present
             public float Rotation;
         }
 
@@ -136,7 +136,7 @@ namespace GME1003GoblinDanceParty
                     _starSprite,
                     s.Position,
                     null,
-                    s.Color * s.Transparency,
+                    s.Color * s.Transparency, // per-star transparency applied
                     s.Rotation,
                     _starOrigin,
                     new Vector2(s.Scale, s.Scale),

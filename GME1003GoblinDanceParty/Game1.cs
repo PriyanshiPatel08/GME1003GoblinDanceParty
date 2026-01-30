@@ -25,6 +25,9 @@ namespace GME1003GoblinDanceParty
         private int _numStars;
         private List<Star> _stars;
 
+        // Parallel list for per-star scales (Activity 4)
+        private List<float> _starScales;
+
         private Texture2D _starSprite;  // the sprite image for our star
         private Vector2 _starOrigin;    // cached origin based on sprite size
 
@@ -53,6 +56,9 @@ namespace GME1003GoblinDanceParty
             // allocate list with known capacity to avoid resizing
             _stars = new List<Star>(_numStars);
 
+            // initialize the parallel scale list (Activity 4)
+            _starScales = new List<float>(_numStars);
+
             // get screen bounds (fallback to common values if GraphicsDevice not ready)
             int screenWidth = GraphicsDevice?.Viewport.Width ?? 800;
             int screenHeight = GraphicsDevice?.Viewport.Height ?? 480;
@@ -60,9 +66,6 @@ namespace GME1003GoblinDanceParty
             // Populate stars with per-star properties
             for (int i = 0; i < _numStars; i++)
             {
-                // rotation speed in range [-PI/4, PI/4] radians/sec (~±45°/s)
-                float rotSpeed = (float)(_rng.NextDouble() * Math.PI / 2.0 - Math.PI / 4.0);
-
                 var s = new Star
                 {
                     Position = new Vector2(
@@ -77,8 +80,8 @@ namespace GME1003GoblinDanceParty
                         (byte)(128 + _rng.Next(0, 129))
                     ),
 
-                    // scale roughly between 0.25 and 0.5 (similar to original)
-                    Scale = _rng.Next(50, 100) / 200f,
+                    // scale assigned below and added to the parallel list
+                    Scale = 0f,
 
                     // transparency between 0.25 and 1.0
                     Transparency = _rng.Next(25, 101) / 100f,
@@ -86,6 +89,11 @@ namespace GME1003GoblinDanceParty
                     // rotation full circle
                     Rotation = (float)(_rng.NextDouble() * Math.PI * 2.0)
                 };
+
+                // Activity 4: compute scale and store in the parallel list
+                float scale = _rng.Next(50, 100) / 200f;
+                s.Scale = scale;
+                _starScales.Add(scale);
 
                 _stars.Add(s);
             }
@@ -126,7 +134,7 @@ namespace GME1003GoblinDanceParty
 
             _spriteBatch.Begin();
 
-            // draw stars using per-star values
+            // draw stars using per-star values and the parallel scale list (Activity 4)
             for (int i = 0; i < _stars.Count; i++)
             {
                 var s = _stars[i];
@@ -139,7 +147,7 @@ namespace GME1003GoblinDanceParty
                     s.Color * s.Transparency, // per-star transparency applied
                     s.Rotation,
                     _starOrigin,
-                    new Vector2(s.Scale, s.Scale),
+                    new Vector2(_starScales[i], _starScales[i]), // use parallel list scale
                     SpriteEffects.None,
                     0f
                 );

@@ -28,6 +28,9 @@ namespace GME1003GoblinDanceParty
         // Parallel list for per-star scales (Activity 4)
         private List<float> _starScales;
 
+        // Parallel list for per-star colors (Activity 5)
+        private List<Color> _starColors;
+
         private Texture2D _starSprite;  // the sprite image for our star
         private Vector2 _starOrigin;    // cached origin based on sprite size
 
@@ -58,6 +61,9 @@ namespace GME1003GoblinDanceParty
 
             // initialize the parallel scale list (Activity 4)
             _starScales = new List<float>(_numStars);
+
+            // initialize the parallel color list (Activity 5)
+            _starColors = new List<Color>(_numStars);
 
             // get screen bounds (fallback to common values if GraphicsDevice not ready)
             int screenWidth = GraphicsDevice?.Viewport.Width ?? 800;
@@ -94,6 +100,9 @@ namespace GME1003GoblinDanceParty
                 float scale = _rng.Next(50, 100) / 200f;
                 s.Scale = scale;
                 _starScales.Add(scale);
+
+                // Activity 5: store the color in the parallel color list
+                _starColors.Add(s.Color);
 
                 _stars.Add(s);
             }
@@ -134,17 +143,17 @@ namespace GME1003GoblinDanceParty
 
             _spriteBatch.Begin();
 
-            // draw stars using per-star values and the parallel scale list (Activity 4)
+            // draw stars using per-star values and the parallel scale + color lists (Activities 4 & 5)
             for (int i = 0; i < _stars.Count; i++)
             {
                 var s = _stars[i];
 
-                // multiply the color by transparency - MonoGame/XNA supports multiplying a Color by a float
+                // use the parallel color list and the star's transparency
                 _spriteBatch.Draw(
                     _starSprite,
                     s.Position,
                     null,
-                    s.Color * s.Transparency, // per-star transparency applied
+                    _starColors[i] * s.Transparency,
                     s.Rotation,
                     _starOrigin,
                     new Vector2(_starScales[i], _starScales[i]), // use parallel list scale
